@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THEWAVES — Food Sales App</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #efefec;
+    --text-primary: #1a1a18;
+    --text-secondary: #6b6b66;
+    --text-hint: #a0a099;
+    --border: rgba(0,0,0,0.12);
+    --border-strong: rgba(0,0,0,0.22);
+    --green: #1D9E75;
+    --green-dark: #0F6E56;
+    --green-light: #E1F5EE;
+    --green-text: #085041;
+    --amber-light: #FAEEDA;
+    --amber-text: #854F0B;
+    --red-light: #FCEBEB;
+    --red-text: #A32D2D;
+    --blue-light: #E6F1FB;
+    --blue-text: #185FA5;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --sidebar-width: 210px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: #1c1c1a;
+      --bg-secondary: #242422;
+      --bg-tertiary: #161614;
+      --text-primary: #f0f0ec;
+      --text-secondary: #9a9a94;
+      --text-hint: #6a6a65;
+      --border: rgba(255,255,255,0.1);
+      --border-strong: rgba(255,255,255,0.2);
+      --green-light: #0a3328;
+      --green-text: #9FE1CB;
+      --amber-light: #2e1f06;
+      --amber-text: #FAC775;
+      --red-light: #2e0f0f;
+      --red-text: #F09595;
+      --blue-light: #071e35;
+      --blue-text: #85B7EB;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Layout ── */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-primary);
+    border-right: 0.5px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+
+  .logo {
+    padding: 1.25rem 1rem 1rem;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+  .logo h2 { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+  .logo span { font-size: 11px; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .nav-section { padding: 0.5rem 0; }
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-hint); padding: 6px 1rem 4px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 1rem;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    border-left: 3px solid transparent;
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .nav-item.active { background: var(--bg-secondary); color: var(--text-primary); border-left-color: var(--green); font-weight: 500; }
+  .nav-item i { font-size: 17px; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+    border-top: 0.5px solid var(--border);
+  }
+  .user-row { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--green-light); color: var(--green-text);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; flex-shrink: 0;
+  }
+  .user-info .name { font-size: 13px; font-weight: 500; }
+  .user-info .role { font-size: 11px; color: var(--text-secondary); }
+
+  /* ── Main ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  .topbar {
+    background: var(--bg-primary);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 500; }
+  .topbar-actions { display: flex; gap: 8px; align-items: center; }
+
+  .page { padding: 1.5rem; flex: 1; overflow-y: auto; }
+  .hidden { display: none !important; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-strong);
+    background: transparent; font-size: 13px; cursor: pointer;
+    color: var(--text-primary); transition: background 0.12s;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--bg-secondary); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--green); color: #fff; border-color: var(--green); }
+  .btn-primary:hover { background: var(--green-dark); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-icon { padding: 6px; border-radius: var(--radius-sm); }
+
+  /* ── Metrics ── */
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+  .metric {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+  }
+  .metric label { font-size: 11px; color: var(--text-secondary); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .metric .val { font-size: 22px; font-weight: 600; color: var(--text-primary); }
+  .metric .trend { font-size: 11px; margin-top: 4px; }
+  .trend-up { color: var(--green); }
+  .trend-warn { color: var(--amber-text); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .card h3 { font-size: 13px; font-weight: 500; margin-bottom: 1rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--text-secondary); font-weight: 400; padding: 7px 8px; border-bottom: 0.5px solid var(--border); font-size: 12px; }
+  td { padding: 9px 8px; border-bottom: 0.5px solid var(--border); color: var(--text-primary); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg-secondary); }
+
+  /* ── Badges ── */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: var(--green-light); color: var(--green-text); }
+  .badge-amber { background: var(--amber-light); color: var(--amber-text); }
+  .badge-red { background: var(--red-light); color: var(--red-text); }
+  .badge-blue { background: var(--blue-light); color: var(--blue-text); }
+
+  /* ── Forms ── */
+  input[type=search], input[type=text], input[type=number], select, textarea {
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-strong);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.12); }
+
+  /* ── Bar charts ── */
+  .bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 12px; }
+  .bar-label { width: 100px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 7px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; background: var(--green); transition: width 0.4s ease; }
+  .bar-count { min-width: 30px; text-align: right; color: var(--text-secondary); }
+
+  /* ── Product grid ── */
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; }
+  .product-card {
+    background: var(--bg-primary);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+    position: relative;
+  }
+  .product-card:hover { border-color: var(--green); transform: translateY(-1px); }
+  .product-card .emoji { font-size: 36px; display: block; margin-bottom: 10px; line-height: 1; }
+  .product-card .pname { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .product-card .pcat { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+  .product-card .pprice { font-size: 14px; font-weight: 600; color: var(--green); margin-top: 8px; }
+  .product-card .add-btn {
+    position: absolute; top: 10px; right: 10px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--green); color: #fff; border: none;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; transition: opacity 0.15s;
+    font-size: 16px;
+  }
+  .product-card:hover .add-btn { opacity: 1; }
+
+  /* ── Cart panel ── */
+  .cart-panel {
+    position: fixed; right: 0; top: 0; bottom: 0;
+    width: 300px;
+    background: var(--bg-primary);
+    border-left: 0.5px solid var(--border);
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    z-index: 200;
+    box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+  }
+  .cart-panel.open { transform: translateX(0); }
+  .cart-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border); }
+  .cart-header h3 { font-size: 15px; font-weight: 500; }
+  .cart-items { flex: 1; overflow-y: auto; padding: 0.5rem 1.25rem; }
+  .cart-empty { text-align: center; padding: 2rem 0; color: var(--text-secondary); font-size: 13px; }
+  .cart-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 0; border-bottom: 0.5px solid var(--border); gap: 8px; }
+  .cart-item:last-child { border-bottom: none; }
+  .ci-left { flex: 1; }
+  .ci-name { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .ci-price { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .qty-ctrl { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .qty-btn { width: 24px; height: 24px; border-radius: 50%; border: 0.5px solid var(--border-strong); background: transparent; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); font-family: inherit; }
+  .qty-btn:hover { background: var(--bg-secondary); }
+  .qty-num { font-size: 13px; min-width: 18px; text-align: center; }
+  .ci-total { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .cart-footer { padding: 1rem 1.25rem; border-top: 0.5px solid var(--border); }
+  .cart-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; color: var(--text-secondary); }
+  .cart-row.total { font-size: 15px; font-weight: 600; color: var(--text-primary); border-top: 0.5px solid var(--border); margin-top: 4px; padding-top: 10px; }
+
+  /* ── Order tracking ── */
+  .order-track { display: flex; align-items: center; gap: 0; margin: 1.5rem 0; }
+  .track-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .track-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--text-hint); background: var(--bg-primary);
+    position: relative; z-index: 1;
+  }
+  .track-dot.done { background: var(--green); border-color: var(--green); color: #fff; }
+  .track-dot.active { border-color: var(--green); color: var(--green); }
+  .track-label { font-size: 11px; color: var(--text-secondary); margin-top: 6px; text-align: center; }
+  .track-line { flex: 1; height: 2px; background: var(--border); margin: 0 -2px; position: relative; top: -14px; }
+  .track-line.done { background: var(--green); }
+
+  /* ── Analytics chart ── */
+  .rev-chart { display: flex; align-items: flex-end; gap: 6px; height: 110px; padding-top: 8px; }
+  .rev-bar { flex: 1; border-radius: 4px 4px 0 0; background: #9FE1CB; position: relative; min-height: 4px; transition: background 0.15s; cursor: default; }
+  .rev-bar.peak { background: var(--green); }
+  .rev-bar:hover { background: var(--green-dark); }
+  .rev-labels { display: flex; gap: 6px; margin-top: 4px; }
+  .rev-label { flex: 1; font-size: 10px; color: var(--text-hint); text-align: center; }
+
+  .hour-chart { display: flex; align-items: flex-end; gap: 3px; height: 80px; }
+  .hour-bar { flex: 1; border-radius: 3px 3px 0 0; background: #9FE1CB; min-height: 3px; }
+  .hour-bar.peak { background: var(--green); }
+
+  /* ── Inventory ── */
+  .stock-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--border);
+    width: 440px; max-width: 92vw;
+    padding: 1.5rem;
+    transform: translateY(8px); transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal h3 { font-size: 15px; font-weight: 500; margin-bottom: 1.25rem; }
+  .form-row { margin-bottom: 14px; }
+  .form-row label { display: block; font-size: 12px; color: var(--text-secondary); margin-bottom: 5px; }
+  .form-row input, .form-row select, .form-row textarea { width: 100%; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    background: var(--text-primary); color: var(--bg-primary);
+    padding: 10px 20px; border-radius: var(--radius-md);
+    font-size: 13px; font-weight: 500;
+    opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 500;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ── Misc ── */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .section-header h2 { font-size: 14px; font-weight: 500; }
+  .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tab { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; border: 0.5px solid var(--border); background: transparent; font-size: 12px; cursor: pointer; color: var(--text-secondary); font-family: inherit; }
+  .tab:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .tab.active { background: var(--green-light); color: var(--green-text); border-color: transparent; font-weight: 500; }
+
+  .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-secondary); }
+  .empty-state i { font-size: 40px; display: block; margin-bottom: 1rem; color: var(--text-hint); }
+
+  .divider { height: 0.5px; background: var(--border); margin: 1rem 0; }
+
+  @media (max-width: 768px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .sidebar { width: 56px; }
+    .sidebar .logo span, .nav-item span, .sidebar-footer .user-info { display: none; }
+    .nav-item { justify-content: center; padding: 12px; }
+    .nav-item i { margin: 0; }
+    .logo { text-align: center; padding: 1rem 0.5rem; }
+    .logo h2 { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="logo">
+      <h2>🌿 <span>LARAFOOD</span></h2>
+      <span>Food Sales Platform</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="nav('dashboard',this)">
+        <i class="ti ti-layout-dashboard"></i><span>Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="nav('menu',this)">
+        <i class="ti ti-tools-kitchen-2"></i><span>Order Menu</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Management</div>
+      <div class="nav-item" onclick="nav('orders',this)">
+        <i class="ti ti-receipt"></i><span>Orders</span>
+      </div>
+      <div class="nav-item" onclick="nav('inventory',this)">
+        <i class="ti ti-box"></i><span>Inventory</span>
+      </div>
+      <div class="nav-item" onclick="nav('analytics',this)">
+        <i class="ti ti-chart-bar"></i><span>Analytics</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Settings</div>
+      <div class="nav-item" onclick="nav('settings',this)">
+        <i class="ti ti-settings"></i><span>Settings</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="avatar">AD</div>
+        <div class="user-info">
+          <div class="name">Admin</div>
+          <div class="role">Manager</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main area ── -->
+  <div class="main">
+    <div class="topbar">
+      <h1 id="page-title">Dashboard</h1>
+      <div class="topbar-actions">
+        <button class="btn" id="cart-btn" onclick="toggleCart()" style="display:none">
+          <i class="ti ti-shopping-cart"></i>
+          Cart
+          <span id="cart-count" style="background:var(--green);color:#fff;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:600">0</span>
+        </button>
+        <button class="btn btn-icon" title="Notifications"><i class="ti ti-bell" style="font-size:17px"></i></button>
+        <div class="avatar" style="cursor:pointer">AD</div>
+      </div>
+    </div>
+
+    <!-- ══════════ DASHBOARD ══════════ -->
+    <div class="page" id="pg-dashboard">
+      <div class="metrics">
+        <div class="metric">
+          <label>Today's Revenue</label>
+          <div class="val">₦184,320</div>
+          <div class="trend trend-up">↑ 12% vs yesterday</div>
+        </div>
+        <div class="metric">
+          <label>Orders Today</label>
+          <div class="val" id="dash-order-count">47</div>
+          <div class="trend trend-up">↑ 8 new this hour</div>
+        </div>
+        <div class="metric">
+          <label>Pending</label>
+          <div class="val" id="dash-pending">9</div>
+          <div class="trend trend-warn">Needs attention</div>
+        </div>
+        <div class="metric">
+          <label>Avg Order Value</label>
+          <div class="val">₦3,922</div>
+          <div class="trend trend-up">↑ 5% this week</div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Recent orders</h3>
+          <table id="dash-orders-table">
+            <thead><tr><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h3>Top selling items</h3>
+          <div id="top-items-chart" style="margin-top:.25rem"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ ORDER MENU ══════════ -->
+    <div class="page hidden" id="pg-menu">
+      <div class="section-header" style="margin-bottom:1rem;flex-wrap:wrap;gap:10px;">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="search" placeholder="Search menu..." style="width:200px" oninput="renderProducts()" id="menu-search">
+          <select onchange="renderProducts()" id="menu-cat">
+            <option value="">All categories</option>
+            <option>Rice Dishes</option>
+            <option>Soups &amp; Stews</option>
+            <option>Grills</option>
+            <option>Snacks</option>
+            <option>Drinks</option>
+          </select>
+        </div>
+        <span style="font-size:12px;color:var(--text-secondary)" id="product-count"></span>
+      </div>
+      <div class="product-grid" id="product-grid"></div>
+    </div>
+
+    <!-- ══════════ ORDERS ══════════ -->
+    <div class="page hidden" id="pg-orders">
+      <div class="section-header">
+        <div class="filter-tabs">
+          <button class="tab active" onclick="filterOrders('all',this)">All</button>
+          <button class="tab" onclick="filterOrders('In Progress',this)">
+            <i class="ti ti-loader" style="font-size:13px"></i> In Progress
+          </button>
+          <button class="tab" onclick="filterOrders('Ready',this)">
+            <i class="ti ti-check" style="font-size:13px"></i> Ready
+          </button>
+          <button class="tab" onclick="filterOrders('Delivered',this)">
+            <i class="ti ti-circle-check" style="font-size:13px"></i> Delivered
+          </button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddOrderModal()">
+          <i class="ti ti-plus"></i> New order
+        </button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table id="orders-table">
+          <thead><tr><th style="padding-left:1.25rem">#</th><th>Customer</th><th>Items</th><th>Total</th><th>Time</th><th>Status</th><th style="padding-right:1.25rem">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ INVENTORY ══════════ -->
+    <div class="page hidden" id="pg-inventory">
+      <div class="section-header">
+        <div style="display:flex;gap:8px">
+          <input type="search" placeholder="Search inventory..." style="width:200px" oninput="renderInventory()" id="inv-search">
+          <select onchange="renderInventory()" id="inv-cat">
+            <option value="">All categories</option>
+            <option>Raw material</option>
+            <option>Protein</option>
+            <option>Vegetables</option>
+            <option>Seasoning</option>
+            <option>Drinks</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAddItemModal()">
+          <i class="ti ti-plus"></i> Add item
+        </button>
+      </div>
+      <div class="metrics" style="grid-template-columns:repeat(3,1fr);margin-bottom:1rem">
+        <div class="metric"><label>Total items</label><div class="val" id="inv-total">8</div></div>
+        <div class="metric"><label>Low stock</label><div class="val" id="inv-low" style="color:var(--amber-text)">2</div></div>
+        <div class="metric"><label>Critical</label><div class="val" id="inv-critical" style="color:var(--red-text)">1</div></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table id="inv-table">
+          <thead><tr><th style="padding-left:1.25rem">Item</th><th>Category</th><th>Stock</th><th>Unit Cost</th><th>Status</th><th style="padding-right:1.25rem">Action</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ ANALYTICS ══════════ -->
+    <div class="page hidden" id="pg-analytics">
+      <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
+        <div class="metric"><label>This week</label><div class="val">₦1.2M</div><div class="trend trend-up">↑ 18% vs last week</div></div>
+        <div class="metric"><label>This month</label><div class="val">₦4.8M</div><div class="trend trend-up">↑ 9% vs last month</div></div>
+        <div class="metric"><label>Total orders</label><div class="val">1,247</div><div class="trend trend-up">Since launch</div></div>
+      </div>
+      <div class="card">
+        <h3>Revenue — last 7 days</h3>
+        <div class="rev-chart" id="rev-chart"></div>
+        <div class="rev-labels" id="rev-labels"></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Category breakdown</h3>
+          <div style="margin-top:.5rem">
+            <div class="bar-wrap"><span class="bar-label">Rice Dishes</span><div class="bar-track"><div class="bar-fill" style="width:48%"></div></div><span class="bar-count">48%</span></div>
+            <div class="bar-wrap"><span class="bar-label">Soups &amp; Stews</span><div class="bar-track"><div class="bar-fill" style="width:27%"></div></div><span class="bar-count">27%</span></div>
+            <div class="bar-wrap"><span class="bar-label">Grills</span><div class="bar-track"><div class="bar-fill" style="width:16%"></div></div><span class="bar-count">16%</span></div>
+            <div class="bar-wrap"><span class="bar-label">Snacks</span><div class="bar-track"><div class="bar-fill" style="width:9%"></div></div><span class="bar-count">9%</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Peak hours today</h3>
+          <div style="font-size:11px;color:var(--text-secondary);margin-bottom:.75rem">Order volume by hour (6am–10pm)</div>
+          <div class="hour-chart" id="hour-chart"></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-hint);margin-top:5px">
+            <span>6 am</span><span>12 pm</span><span>6 pm</span><span>10 pm</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Top customers</h3>
+        <table>
+          <thead><tr><th>Customer</th><th>Total orders</th><th>Total spent</th><th>Last order</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Amaka Okonkwo</td><td>38</td><td>₦142,500</td><td>Today</td><td><span class="badge badge-green">VIP</span></td></tr>
+            <tr><td>Emeka Bright</td><td>24</td><td>₦88,200</td><td>Yesterday</td><td><span class="badge badge-green">Regular</span></td></tr>
+            <tr><td>Fatima Abdullahi</td><td>19</td><td>₦74,000</td><td>2 days ago</td><td><span class="badge badge-green">Regular</span></td></tr>
+            <tr><td>Chike Nwosu</td><td>12</td><td>₦42,600</td><td>3 days ago</td><td><span class="badge badge-blue">New</span></td></tr>
+            <tr><td>Ngozi Mensah</td><td>8</td><td>₦28,800</td><td>5 days ago</td><td><span class="badge badge-blue">New</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════ SETTINGS ══════════ -->
+    <div class="page hidden" id="pg-settings">
+      <div class="grid2">
+        <div>
+          <div class="card">
+            <h3>Business info</h3>
+            <div class="form-row"><label>Business name</label><input type="text" value="FreshMart Food Sales"></div>
+            <div class="form-row"><label>Phone number</label><input type="text" value="+234 800 123 4567"></div>
+            <div class="form-row"><label>Address</label><textarea style="width:100%;resize:vertical;min-height:72px">12 Bodija Market Road, Ibadan, Oyo State</textarea></div>
+            <div class="form-row"><label>Currency</label>
+              <select style="width:100%"><option>₦ Nigerian Naira (NGN)</option><option>$ US Dollar (USD)</option><option>£ British Pound (GBP)</option></select>
+            </div>
+            <button class="btn btn-primary">Save changes</button>
+          </div>
+          <div class="card">
+            <h3>Delivery settings</h3>
+            <div class="form-row"><label>Standard delivery fee (₦)</label><input type="number" value="500"></div>
+            <div class="form-row"><label>Free delivery threshold (₦)</label><input type="number" value="10000"></div>
+            <div class="form-row"><label>Estimated delivery time</label><input type="text" value="30–45 minutes"></div>
+            <button class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Notification preferences</h3>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+                <span>New order alert</span>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                  <input type="checkbox" checked> <span style="color:var(--text-secondary)">Email</span>
+                </label>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+                <span>Low stock alert</span>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                  <input type="checkbox" checked> <span style="color:var(--text-secondary)">Email</span>
+                </label>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+                <span>Daily summary report</span>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                  <input type="checkbox"> <span style="color:var(--text-secondary)">Email</span>
+                </label>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+                <span>Payment confirmations</span>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                  <input type="checkbox" checked> <span style="color:var(--text-secondary)">Email</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Payment methods</h3>
+            <div style="display:flex;flex-direction:column;gap:12px;font-size:13px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span>Cash on delivery</span><span class="badge badge-green">Active</span>
+              </div>
+              <div class="divider" style="margin:0"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span>Bank transfer</span><span class="badge badge-green">Active</span>
+              </div>
+              <div class="divider" style="margin:0"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span>Paystack</span><span class="badge badge-amber">Not connected</span>
+              </div>
+              <div class="divider" style="margin:0"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span>Flutterwave</span><span class="badge badge-amber">Not connected</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .main -->
+</div><!-- end .app -->
+
+<!-- ── Cart panel ── -->
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h3><i class="ti ti-shopping-cart" style="font-size:16px;margin-right:6px;vertical-align:-2px"></i>Your cart</h3>
+    <button class="btn btn-icon" onclick="toggleCart()"><i class="ti ti-x" style="font-size:17px"></i></button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="cart-empty"><i class="ti ti-shopping-cart-off"></i>No items yet.<br>Browse the menu to add items.</div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-row"><span>Subtotal</span><span id="cart-subtotal">₦0</span></div>
+    <div class="cart-row"><span>Delivery fee</span><span>₦500</span></div>
+    <div class="cart-row total"><span>Total</span><span id="cart-total">₦500</span></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:.75rem;justify-content:center" onclick="placeOrder()">
+      <i class="ti ti-check"></i> Place order
+    </button>
+  </div>
+</div>
+
+<!-- ── Add item modal ── -->
+<div class="modal-overlay" id="add-item-modal">
+  <div class="modal">
+    <h3>Add inventory item</h3>
+    <div class="form-row"><label>Item name</label><input type="text" id="new-item-name" placeholder="e.g. Palm Oil (25L)"></div>
+    <div class="form-grid">
+      <div class="form-row"><label>Category</label>
+        <select id="new-item-cat" style="width:100%">
+          <option>Raw material</option><option>Protein</option><option>Vegetables</option><option>Seasoning</option><option>Drinks</option>
+        </select>
+      </div>
+      <div class="form-row"><label>Status</label>
+        <select id="new-item-status" style="width:100%">
+          <option>Good</option><option>Low</option><option>Critical</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row"><label>Stock quantity</label><input type="text" id="new-item-stock" placeholder="e.g. 12 bags"></div>
+      <div class="form-row"><label>Unit cost (₦)</label><input type="number" id="new-item-cost" placeholder="e.g. 9500"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('add-item-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveInventoryItem()">Add item</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add order modal ── -->
+<div class="modal-overlay" id="add-order-modal">
+  <div class="modal">
+    <h3>New order</h3>
+    <div class="form-row"><label>Customer name</label><input type="text" id="new-order-customer" placeholder="Customer name"></div>
+    <div class="form-row"><label>Items</label><input type="text" id="new-order-items" placeholder="e.g. Jollof Rice x2, Suya x1"></div>
+    <div class="form-row"><label>Total amount (₦)</label><input type="number" id="new-order-total" placeholder="e.g. 5400"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('add-order-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveOrder()">Add order</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── DATA ─── */
+const PRODUCTS = [
+  {id:1, name:'Jollof Rice',        price:2400, cat:'Rice Dishes',    emoji:'🍛'},
+  {id:2, name:'Ofada Rice',         price:2500, cat:'Rice Dishes',    emoji:'🍚'},
+  {id:3, name:'Fried Rice',         price:2800, cat:'Rice Dishes',    emoji:'🍳'},
+  {id:4, name:'White Rice & Stew',  price:2200, cat:'Rice Dishes',    emoji:'🥣'},
+  {id:5, name:'Egusi Soup',         price:3200, cat:'Soups & Stews',  emoji:'🥘'},
+  {id:6, name:'Bitterleaf Soup',    price:2900, cat:'Soups & Stews',  emoji:'🍲'},
+  {id:7, name:'Pepper Soup',        price:3500, cat:'Soups & Stews',  emoji:'🍜'},
+  {id:8, name:'Ofe Onugbu',         price:3000, cat:'Soups & Stews',  emoji:'🫕'},
+  {id:9, name:'Suya',               price:1200, cat:'Grills',         emoji:'🥩'},
+  {id:10,name:'Grilled Chicken',    price:3800, cat:'Grills',         emoji:'🍗'},
+  {id:11,name:'BBQ Fish',           price:4200, cat:'Grills',         emoji:'🐟'},
+  {id:12,name:'Puff Puff',          price:500,  cat:'Snacks',         emoji:'🟤'},
+  {id:13,name:'Chin-Chin',          price:800,  cat:'Snacks',         emoji:'🟡'},
+  {id:14,name:'Fried Plantain',     price:900,  cat:'Snacks',         emoji:'🍌'},
+  {id:15,name:'Meat Pie',           price:700,  cat:'Snacks',         emoji:'🥧'},
+  {id:16,name:'Zobo Drink',         price:600,  cat:'Drinks',         emoji:'🍹'},
+  {id:17,name:'Kunu',               price:500,  cat:'Drinks',         emoji:'🥤'},
+  {id:18,name:'Chapman',            price:1200, cat:'Drinks',         emoji:'🍊'},
+];
+
+let ORDERS = [
+  {id:'#1047', customer:'olusolade G.',   items:'Jollof Rice x2',           total:4800, time:'11:32', status:'Delivered'},
+  {id:'#1046', customer:'Daniel O.',   items:'Egusi Soup, Puff Puff',    total:6200, time:'11:15', status:'In Progress'},
+  {id:'#1045', customer:'Fatima A.',  items:'Suya x3',                  total:3600, time:'10:58', status:'Ready'},
+  {id:'#1044', customer:'Chike N.',   items:'Ofada Rice',               total:2500, time:'10:44', status:'In Progress'},
+  {id:'#1043', customer:'Olusolade M.',   items:'Chin-Chin, Puff Puff',     total:1800, time:'10:20', status:'Delivered'},
+  {id:'#1042', customer:'Olusolade T.',    items:'Fried Rice x2',            total:5600, time:'09:55', status:'Delivered'},
+  {id:'#1041', customer:'Omolara M.',    items:'Bitterleaf Soup',          total:2900, time:'09:30', status:'Delivered'},
+  {id:'#1040', customer:'Emmanuel S.',   items:'Pepper Soup, Zobo',        total:4100, time:'09:05', status:'Delivered'},
+];
+
+let INVENTORY = [
+  {name:'Parboiled Rice (50kg)', cat:'Raw material', stock:'12 bags',  cost:42000, status:'Good'},
+  {name:'Palm Oil (25L)',        cat:'Raw material', stock:'8 kegs',   cost:9500,  status:'Good'},
+  {name:'Chicken (frozen)',      cat:'Protein',      stock:'34 kg',    cost:3200,  status:'Low'},
+  {name:'Beef (fresh)',          cat:'Protein',      stock:'18 kg',    cost:2800,  status:'Good'},
+  {name:'Tomatoes',              cat:'Vegetables',   stock:'5 baskets',cost:4500,  status:'Critical'},
+  {name:'Egusi (ground)',        cat:'Raw material', stock:'20 kg',    cost:1800,  status:'Good'},
+  {name:'Suya Spice',            cat:'Seasoning',    stock:'3 kg',     cost:2200,  status:'Low'},
+  {name:'Flour (10kg)',          cat:'Raw material', stock:'22 bags',  cost:8000,  status:'Good'},
+];
+
+let cart = {};
+let currentOrderFilter = 'all';
+let orderCounter = 1048;
+
+/* ─── NAVIGATION ─── */
+function nav(page, el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  (el || document.querySelector(`.nav-item[onclick*="'${page}'"]`)).classList.add('active');
+  document.getElementById('pg-' + page).classList.remove('hidden');
+  const titles = {dashboard:'Dashboard', menu:'Order Menu', orders:'Orders', inventory:'Inventory', analytics:'Analytics', settings:'Settings'};
+  document.getElementById('page-title').textContent = titles[page] || page;
+  document.getElementById('cart-btn').style.display = page === 'menu' ? '' : 'none';
+  if (page === 'orders')    renderOrders(currentOrderFilter);
+  if (page === 'inventory') renderInventory();
+  if (page === 'dashboard') renderDashboard();
+}
+
+/* ─── DASHBOARD ─── */
+function renderDashboard() {
+  const tbody = document.querySelector('#dash-orders-table tbody');
+  const recent = ORDERS.slice(0, 6);
+  tbody.innerHTML = recent.map(o => `
+    <tr>
+      <td>${o.customer}</td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.items}</td>
+      <td>₦${o.total.toLocaleString()}</td>
+      <td>${statusBadge(o.status)}</td>
+    </tr>`).join('');
+
+  const topItems = [
+    {name:'Jollof Rice', count:92},
+    {name:'Egusi Soup',  count:74},
+    {name:'Suya',        count:68},
+    {name:'Puff Puff',   count:55},
+    {name:'Ofada Rice',  count:41},
+    {name:'Chin-Chin',   count:30},
+  ];
+  const max = topItems[0].count;
+  document.getElementById('top-items-chart').innerHTML = topItems.map(i => `
+    <div class="bar-wrap">
+      <span class="bar-label">${i.name}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(i.count/max*100)}%"></div></div>
+      <span class="bar-count">${i.count}</span>
+    </div>`).join('');
+
+  document.getElementById('dash-pending').textContent = ORDERS.filter(o => o.status === 'In Progress').length;
+  document.getElementById('dash-order-count').textContent = ORDERS.length;
+}
+
+/* ─── MENU / PRODUCTS ─── */
+function renderProducts() {
+  const q   = document.getElementById('menu-search').value.toLowerCase();
+  const cat = document.getElementById('menu-cat').value;
+  const filtered = PRODUCTS.filter(p =>
+    p.name.toLowerCase().includes(q) && (!cat || p.cat === cat)
+  );
+  document.getElementById('product-count').textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''}`;
+  const grid = document.getElementById('product-grid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="ti ti-search-off"></i>No items match your search.</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card" onclick="addToCart(${p.id})">
+      <button class="add-btn" aria-label="Add to cart">+</button>
+      <span class="emoji">${p.emoji}</span>
+      <div class="pname">${p.name}</div>
+      <div class="pcat">${p.cat}</div>
+      <div class="pprice">₦${p.price.toLocaleString()}</div>
+    </div>`).join('');
+}
+
+/* ─── CART ─── */
+function addToCart(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+  cart[id] = cart[id] || {...p, qty: 0};
+  cart[id].qty++;
+  updateCartUI();
+  showToast(`${p.emoji} ${p.name} added`);
+}
+
+function changeQty(id, d) {
+  if (!cart[id]) return;
+  cart[id].qty = Math.max(0, cart[id].qty + d);
+  if (cart[id].qty === 0) delete cart[id];
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const items = Object.values(cart);
+  const count = items.reduce((s, x) => s + x.qty, 0);
+  document.getElementById('cart-count').textContent = count;
+  const subtotal = items.reduce((s, x) => s + x.price * x.qty, 0);
+  document.getElementById('cart-subtotal').textContent = '₦' + subtotal.toLocaleString();
+  document.getElementById('cart-total').textContent = '₦' + (subtotal + 500).toLocaleString();
+  const el = document.getElementById('cart-items');
+  if (!items.length) {
+    el.innerHTML = '<div class="cart-empty"><i class="ti ti-shopping-cart-off"></i>No items yet.<br>Browse the menu to add items.</div>';
+    return;
+  }
+  el.innerHTML = items.map(x => `
+    <div class="cart-item">
+      <div class="ci-left">
+        <div class="ci-name">${x.emoji} ${x.name}</div>
+        <div class="ci-price">₦${x.price.toLocaleString()} each</div>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="changeQty(${x.id},-1)">−</button>
+          <span class="qty-num">${x.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${x.id},1)">+</button>
+        </div>
+      </div>
+      <div class="ci-total">₦${(x.price * x.qty).toLocaleString()}</div>
+    </div>`).join('');
+}
+
+function toggleCart() {
+  document.getElementById('cart-panel').classList.toggle('open');
+}
+
+function placeOrder() {
+  const items = Object.values(cart);
+  if (!items.length) { showToast('Cart is empty!'); return; }
+  const total = items.reduce((s, x) => s + x.price * x.qty, 0) + 500;
+  const now = new Date();
+  const time = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  const newOrder = {
+    id: '#' + orderCounter++,
+    customer: 'Walk-in Customer',
+    items: items.map(x => x.name + (x.qty > 1 ? ' x' + x.qty : '')).join(', '),
+    total,
+    time,
+    status: 'In Progress',
+  };
+  ORDERS.unshift(newOrder);
+  cart = {};
+  updateCartUI();
+  document.getElementById('cart-panel').classList.remove('open');
+  showToast('✅ Order placed — ' + newOrder.id);
+  renderDashboard();
+}
+
+/* ─── ORDERS ─── */
+function statusBadge(s) {
+  const map = {Delivered:'badge-green','In Progress':'badge-amber',Ready:'badge-blue'};
+  return `<span class="badge ${map[s]||'badge-blue'}">${s}</span>`;
+}
+
+function advanceStatus(id) {
+  const o = ORDERS.find(x => x.id === id);
+  if (!o) return;
+  const next = {'In Progress':'Ready', Ready:'Delivered'};
+  if (next[o.status]) {
+    o.status = next[o.status];
+    renderOrders(currentOrderFilter);
+    renderDashboard();
+    showToast(`${id} marked as ${o.status}`);
+  }
+}
+
+function filterOrders(f, btn) {
+  currentOrderFilter = f;
+  document.querySelectorAll('#pg-orders .tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderOrders(f);
+}
+
+function renderOrders(filter) {
+  const filtered = filter === 'all' ? ORDERS : ORDERS.filter(o => o.status === filter);
+  const tbody = document.querySelector('#orders-table tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-secondary)">No ${filter === 'all' ? '' : filter + ' '}orders found.</td></tr>`;
+    return;
+  }
+  const nextLabel = {'In Progress':'Mark ready', Ready:'Mark delivered'};
+  tbody.innerHTML = filtered.map(o => `
+    <tr>
+      <td style="padding-left:1.25rem;color:var(--text-secondary);font-size:12px">${o.id}</td>
+      <td style="font-weight:500">${o.customer}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-secondary)">${o.items}</td>
+      <td style="font-weight:500">₦${o.total.toLocaleString()}</td>
+      <td style="color:var(--text-secondary)">${o.time}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td style="padding-right:1.25rem">${o.status !== 'Delivered' ? `<button class="btn btn-sm" onclick="advanceStatus('${o.id}')">${nextLabel[o.status]}</button>` : ''}</td>
+    </tr>`).join('');
+}
+
+function openAddOrderModal() { document.getElementById('add-order-modal').classList.add('open'); }
+
+function saveOrder() {
+  const customer = document.getElementById('new-order-customer').value.trim();
+  const items    = document.getElementById('new-order-items').value.trim();
+  const total    = parseInt(document.getElementById('new-order-total').value) || 0;
+  if (!customer || !items) { showToast('Please fill in all fields'); return; }
+  const now = new Date();
+  ORDERS.unshift({
+    id: '#' + orderCounter++,
+    customer, items, total,
+    time: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+    status: 'In Progress',
+  });
+  closeModal('add-order-modal');
+  renderOrders(currentOrderFilter);
+  renderDashboard();
+  showToast('Order added successfully');
+  document.getElementById('new-order-customer').value = '';
+  document.getElementById('new-order-items').value = '';
+  document.getElementById('new-order-total').value = '';
+}
+
+/* ─── INVENTORY ─── */
+function invStatusBadge(s) {
+  const map = {Good:'badge-green', Low:'badge-amber', Critical:'badge-red'};
+  return `<span class="badge ${map[s]||'badge-blue'}">${s}</span>`;
+}
+
+function renderInventory() {
+  const q   = document.getElementById('inv-search').value.toLowerCase();
+  const cat = document.getElementById('inv-cat').value;
+  const filtered = INVENTORY.filter(i =>
+    i.name.toLowerCase().includes(q) && (!cat || i.cat === cat)
+  );
+  document.getElementById('inv-total').textContent = INVENTORY.length;
+  document.getElementById('inv-low').textContent = INVENTORY.filter(i => i.status === 'Low').length;
+  document.getElementById('inv-critical').textContent = INVENTORY.filter(i => i.status === 'Critical').length;
+  const tbody = document.querySelector('#inv-table tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-secondary)">No items found.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map((item, idx) => `
+    <tr>
+      <td style="padding-left:1.25rem;font-weight:500">${item.name}</td>
+      <td style="color:var(--text-secondary)">${item.cat}</td>
+      <td>${item.stock}</td>
+      <td>₦${item.cost.toLocaleString()}</td>
+      <td>${invStatusBadge(item.status)}</td>
+      <td style="padding-right:1.25rem">
+        <button class="btn btn-sm" onclick="removeInventoryItem(${INVENTORY.indexOf(item)})">
+          <i class="ti ti-trash" style="font-size:13px"></i>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function openAddItemModal() { document.getElementById('add-item-modal').classList.add('open'); }
+
+function saveInventoryItem() {
+  const name   = document.getElementById('new-item-name').value.trim();
+  const cat    = document.getElementById('new-item-cat').value;
+  const status = document.getElementById('new-item-status').value;
+  const stock  = document.getElementById('new-item-stock').value.trim();
+  const cost   = parseInt(document.getElementById('new-item-cost').value) || 0;
+  if (!name || !stock) { showToast('Please fill in name and stock'); return; }
+  INVENTORY.push({name, cat, stock, cost, status});
+  closeModal('add-item-modal');
+  renderInventory();
+  showToast('Item added to inventory');
+  document.getElementById('new-item-name').value = '';
+  document.getElementById('new-item-stock').value = '';
+  document.getElementById('new-item-cost').value = '';
+}
+
+function removeInventoryItem(idx) {
+  if (!confirm(`Remove "${INVENTORY[idx].name}"?`)) return;
+  INVENTORY.splice(idx, 1);
+  renderInventory();
+  showToast('Item removed');
+}
+
+/* ─── ANALYTICS CHARTS ─── */
+function buildAnalyticsCharts() {
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const revs = [142000,168000,155000,201000,189000,247000,184320];
+  const max  = Math.max(...revs);
+  const rc   = document.getElementById('rev-chart');
+  const rl   = document.getElementById('rev-labels');
+  rc.innerHTML = ''; rl.innerHTML = '';
+  days.forEach((d, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'rev-bar' + (i === 6 ? ' peak' : '');
+    bar.style.height = Math.round(revs[i] / max * 100) + '%';
+    bar.title = d + ': ₦' + revs[i].toLocaleString();
+    rc.appendChild(bar);
+    const lbl = document.createElement('div');
+    lbl.className = 'rev-label'; lbl.textContent = d;
+    rl.appendChild(lbl);
+  });
+
+  const hours = [2,3,1,2,5,8,12,15,10,7,14,18,11,8,5,3];
+  const hMax  = Math.max(...hours);
+  const hc    = document.getElementById('hour-chart');
+  hc.innerHTML = '';
+  hours.forEach(v => {
+    const b = document.createElement('div');
+    b.className = 'hour-bar' + (v >= 14 ? ' peak' : '');
+    b.style.height = Math.round(v / hMax * 100) + '%';
+    hc.appendChild(b);
+  });
+}
+
+/* ─── MODAL ─── */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* ─── TOAST ─── */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ─── INIT ─── */
+renderProducts();
+renderDashboard();
+buildAnalyticsCharts();
+</script>
+</body>
+</html>
